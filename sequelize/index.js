@@ -24,10 +24,7 @@ const ratingsDB = new Sequelize({
 
 const modelDefiners = [
 	require('./models/movies'),
-	require('./models/ratings') //,	
-	// require('./models/orchestra.model'),
-	// Add more models here...
-	// require('./models/item'),
+	require('./models/ratings')
 ];
 
 // We define all models according to their files.

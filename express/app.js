@@ -26,21 +26,30 @@ function makeHandlerAwareOfAsyncErrors(handler) {
 // We provide a root route just as an example
 app.get('/', (req, res) => {
 	res.send(`
-		<h2>Hello, Sequelize + Express!</h2>
-		<p>Make sure you have executed <b>npm run setup-example-db</b> once to have a populated example database. Otherwise, you will get <i>'no such table'</i> errors.</p>
-		<p>Try some routes, such as <a href='/api/users'>/api/users</a> or <a href='/api/orchestras?includeInstruments'>/api/orchestras?includeInstruments</a>!</p>
-		<p>To experiment with POST/PUT/DELETE requests, use a tool for creating HTTP requests such as <a href='https://github.com/jakubroztocil/httpie#readme'>HTTPie</a>, <a href='https://www.postman.com/downloads/'>Postman</a>, or even <a href='https://en.wikipedia.org/wiki/CURL'>the curl command</a>, or write some JS code for it with <a href='https://github.com/sindresorhus/got#readme'>got</a>, <a href='https://github.com/sindresorhus/ky#readme'>ky</a> or <a href='https://github.com/axios/axios#readme'>axios</a>.</p>
+	<h2 id="see-it-in-action">See it in action</h2>
+	<ul>
+	<li>Install dependencies with <code>npm install</code> or <code>yarn install</code></li>
+	<li>Run the express server with <code>npm start</code></li>
+	<li>Open your browser in <code>localhost:8080</code> and try the example REST endpoints:<ul>
+	<li><code>localhost:8080/movies/?page=1</code> (GET)</li>
+	<li><code>localhost:8080/movies/byId/:id</code> (GET)</li>
+	<li><code>localhost:8080/movies/byYear/:year?page=1</code> (GET)</li>
+	<li><code>localhost:8080/movies/byGenre/:genreId?page=1</code> (GET)</li>
+	<li>pages are served 50 results at a time</li>
+	</ul>
+	</li>
+	</ul>
+	<h2 id="license">License</h2>
+	<p>MIT</p>	
 	`);
 });
-
-
 		app.get(
 			`/movies`,
 			makeHandlerAwareOfAsyncErrors(routes.movies.getAll)
 		);
 
 		app.get(
-			`/movies/:id`,
+			`/movies/byId/:id`,
 			makeHandlerAwareOfAsyncErrors(routes.movies.getById)
 		);
 
@@ -51,7 +60,7 @@ app.get('/', (req, res) => {
 		);
 
 		app.get(
-			`/movies/byGenre/:genre`,
+			`/movies/byGenre/:genreId`,
 			makeHandlerAwareOfAsyncErrors(routes.movies.getByGenre)
 		);
 

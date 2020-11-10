@@ -66,7 +66,7 @@ async function getByYear(req, res) {
   }
 
   async function getByGenre(req, res) {
-	const genreId = getIdentifer(req, 'genre');
+	const genreId = getIdentifer(req, 'genreId');
 	const offset = offsetFormat(req.query.page);
 	const moviesByGenre = (
 	  await movies.findAll({
