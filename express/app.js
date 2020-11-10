@@ -40,13 +40,13 @@ app.get('/', (req, res) => {
 for (const [routeName, routeController] of Object.entries(routes)) {
 	if (routeController.getAll) {
 		app.get(
-			`/api/${routeName}`,
+			`/${routeName}`,
 			makeHandlerAwareOfAsyncErrors(routeController.getAll)
 		);
 	}
 	if (routeController.getById) {
 		app.get(
-			`/api/${routeName}/:id`,
+			`/${routeName}/:id`,
 			makeHandlerAwareOfAsyncErrors(routeController.getById)
 		);
 	}

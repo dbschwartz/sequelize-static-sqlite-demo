@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const { applyExtraSetup } = require('./extra-setup');
+const movies = require('./models/movies');
 
 // In a real app, you should keep the database connection URL as an environment variable.
 // But for this example, we will just use a local SQLite database.
@@ -16,7 +17,7 @@ const moviesDB = new Sequelize({
 
 const ratingsDB = new Sequelize({
 	dialect: 'sqlite',
-	storage: 'db/movies.db',
+	storage: 'db/ratings.db',
 	logQueryParameters: true,
 	benchmark: true
 });
@@ -33,7 +34,7 @@ const modelDefiners = [
 // for (const modelDefiner of modelDefiners) {
 // 	modelDefiner(sequelize);
 // }
-
+//ratingsDB.dialect.supports.schemas = true; 
 sequelize.movies = require('./models/movies')(moviesDB, DataTypes);
 sequelize.ratings = require('./models/ratings')(ratingsDB, DataTypes);
 

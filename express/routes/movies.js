@@ -1,19 +1,46 @@
-const { movies } = require('../../sequelize');
+const { movies, ratings } = require('../../sequelize');
 const { getIdParam } = require('../helpers');
+const Sequelize = require('sequelize');
+
+const toDollars = val => `$${val.toLocaleString("en-US")}`;
+
 
 async function getAll(req, res) {
-	const users = await movies.findAll({
-        attributes: ['imdbId', 'title', 'genres', 'releaseDate', 'budget'],
-        limit: 50
-    });
+	if (!req.query || !req.query.page)  {
+		req.query.page = 1;
+	}
+	const users = (
+	  await movies.findAll({
+		attributes: ["imdbId", "title", "genres", "releaseDate", "budget"],
+		offset: req.query.page >= 2 ? req.query.page - 1 * 50 : 0,
+		limit: 5
+	  })
+	).map(({imdbId, title, genres, releaseDate, budget}) => ({
+	  imdbId,
+	  title,
+	  genres,
+	  releaseDate,
+	  budget: toDollars(budget),
+	}));
 	res.status(200).json(users);
-};
+  }
+  
 
 async function getById(req, res) {
 	const id = getIdParam(req);
-	const user = await movies.findByPk(id);
-	if (user) {
-		res.status(200).json(user);
+	const movie = await movies.findOne({
+		where: {movieId: id},
+		attributes : {
+			exclude: ['revenue']
+		}
+	});
+	const ratingForMovie = await ratings.findOne({
+		where: {movieId: id},
+		attributes: ["rating"]
+	});
+	if (movie) {
+		movie.dataValues.budget = toDollars(movie.dataValues.budget);
+		res.status(200).json(Object.assign(movie.dataValues, ratingForMovie.dataValues))
 	} else {
 		res.status(404).send('404 - Not found');
 	}

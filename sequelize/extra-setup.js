@@ -1,6 +1,10 @@
 function applyExtraSetup({ratings, movies}) {
 	//const { instrument, orchestra } = sequelize.models;
-	ratings.hasMany(movies, { foreignKey: 'movieId'})
+	movies.hasOne(ratings, {foreignKey: {
+		name: 'movieId'
+	  }});
+	ratings.belongsTo(movies);
+
 
 	// orchestra.hasMany(instrument);
 	// instrument.belongsTo(orchestra);
