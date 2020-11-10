@@ -2,9 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const routes = {
-	// users: require('./routes/users'),
-	// instruments: require('./routes/instruments'),
-	// orchestras: require('./routes/orchestras'),
 	movies: require('./routes/movies'),
 	// Add more routes here...
 	// items: require('./routes/items'),
@@ -36,38 +33,30 @@ app.get('/', (req, res) => {
 	`);
 });
 
-// We define the standard REST APIs for each route (if they exist).
-for (const [routeName, routeController] of Object.entries(routes)) {
-	if (routeController.getAll) {
+
 		app.get(
-			`/${routeName}`,
-			makeHandlerAwareOfAsyncErrors(routeController.getAll)
+			`/movies`,
+			makeHandlerAwareOfAsyncErrors(routes.movies.getAll)
 		);
-	}
-	if (routeController.getById) {
+
 		app.get(
-			`/${routeName}/:id`,
-			makeHandlerAwareOfAsyncErrors(routeController.getById)
+			`/movies/:id`,
+			makeHandlerAwareOfAsyncErrors(routes.movies.getById)
 		);
-	}
-	if (routeController.create) {
-		app.post(
-			`/api/${routeName}`,
-			makeHandlerAwareOfAsyncErrors(routeController.create)
+
+
+		app.get(
+			`/movies/byYear/:year`,
+			makeHandlerAwareOfAsyncErrors(routes.movies.getByYear)
 		);
-	}
-	if (routeController.update) {
-		app.put(
-			`/api/${routeName}/:id`,
-			makeHandlerAwareOfAsyncErrors(routeController.update)
+
+		app.get(
+			`/movies/byGenre/:genre`,
+			makeHandlerAwareOfAsyncErrors(routes.movies.getByGenre)
 		);
-	}
-	if (routeController.remove) {
-		app.delete(
-			`/api/${routeName}/:id`,
-			makeHandlerAwareOfAsyncErrors(routeController.remove)
-		);
-	}
-}
+
+		
+	
+
 
 module.exports = app;

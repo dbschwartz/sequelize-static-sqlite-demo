@@ -1,33 +1,33 @@
 const { movies, ratings } = require('../../sequelize');
-const { getIdParam } = require('../helpers');
-const Sequelize = require('sequelize');
+const { getIdentifer, getYearParam } = require('../helpers');
+const { Op } = require('sequelize');
 
 const toDollars = val => `$${val.toLocaleString("en-US")}`;
+const offsetFormat = (page = 1) => (Number(page) - 1) * 50;
+const mapper = ({imdbId, title, genres, releaseDate, budget}) => ({
+	imdbId,
+	title,
+	genres,
+	releaseDate,
+	budget: toDollars(budget)
+  });
 
 
 async function getAll(req, res) {
-	if (!req.query || !req.query.page)  {
-		req.query.page = 1;
-	}
-	const users = (
+	const offset = offsetFormat(req.query.page);
+	const moviesByPage = (
 	  await movies.findAll({
 		attributes: ["imdbId", "title", "genres", "releaseDate", "budget"],
-		offset: req.query.page >= 2 ? req.query.page - 1 * 50 : 0,
-		limit: 5
+		offset,
+		limit: 50
 	  })
-	).map(({imdbId, title, genres, releaseDate, budget}) => ({
-	  imdbId,
-	  title,
-	  genres,
-	  releaseDate,
-	  budget: toDollars(budget),
-	}));
-	res.status(200).json(users);
+	).map(mapper);
+	res.status(200).json(moviesByPage);
   }
   
 
 async function getById(req, res) {
-	const id = getIdParam(req);
+	const id = getIdentifer(req, 'id');
 	const movie = await movies.findOne({
 		where: {movieId: id},
 		attributes : {
@@ -46,45 +46,47 @@ async function getById(req, res) {
 	}
 };
 
-async function create(req, res) {
-	if (req.body.id) {
-		res.status(400).send(`Bad request: ID should not be provided, since it is determined automatically by the database.`)
-	} else {
-		await movies.create(req.body);
-		res.status(201).end();
-	}
-};
-
-async function update(req, res) {
-	const id = getIdParam(req);
-
-	// We only accept an UPDATE request if the `:id` param matches the body `id`
-	if (req.body.id === id) {
-		await movies.update(req.body, {
-			where: {
-				id: id
-			}
-		});
-		res.status(200).end();
-	} else {
-		res.status(400).send(`Bad request: param ID (${id}) does not match body ID (${req.body.id}).`);
-	}
-};
-
-async function remove(req, res) {
-	const id = getIdParam(req);
-	await movies.destroy({
+async function getByYear(req, res) {
+	const year = getYearParam(req);
+	const offset = offsetFormat(req.query.page);
+	const moviesByYear = (
+	  await movies.findAll({
+		attributes: ["imdbId", "title", "genres", "releaseDate", "budget"],
 		where: {
-			id: id
-		}
-	});
-	res.status(200).end();
-};
+			releaseDate: {
+				[Op.like]: `${year}%`
+			}
+		},
+		order: [['releaseDate', 'DESC']],
+		offset,
+		limit: 50
+	  })
+	).map(mapper);
+	res.status(200).json(moviesByYear);
+  }
+
+  async function getByGenre(req, res) {
+	const genreId = getIdentifer(req, 'genre');
+	const offset = offsetFormat(req.query.page);
+	const moviesByGenre = (
+	  await movies.findAll({
+		attributes: ["imdbId", "title", "genres", "releaseDate", "budget"],
+		where: {
+			genres: {
+				[Op.like]: `%: ${genreId},%`
+			}
+		},
+		offset,
+		limit: 50
+	  })
+	).map(mapper);
+	res.status(200).json(moviesByGenre);
+  }
+
 
 module.exports = {
 	getAll,
 	getById,
-	create,
-	update,
-	remove,
+	getByYear,
+	getByGenre
 };
