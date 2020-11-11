@@ -64,6 +64,11 @@ app.get('/', (req, res) => {
 			makeHandlerAwareOfAsyncErrors(routes.movies.getByGenre)
 		);
 
+		app.use(function (err, req, res, next) {
+			//logging err.stack
+			console.error(err.stack)
+			res.status(500).json({error: 500, message:'Internal Server Error, please contact Tech Support'})
+		  })
 		
 	
 
