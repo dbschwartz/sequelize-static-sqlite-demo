@@ -34,3 +34,6 @@ node_modules
 config/runtime.yamls
 # Runtime configuration for swagger app
 *.env
+
+# macOS System Files
+.DS_Store
